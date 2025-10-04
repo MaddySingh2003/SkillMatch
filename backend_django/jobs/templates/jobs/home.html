@@ -1,0 +1,11 @@
+{% extends "jobs/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Available Jobs</h2>
+<ul class="">
+{% for job in jobs %}
+    <li class="mb-4 p-3 border rounded bg-amber-50 "><b><p class="font-extrabold">{{ job.title }}</p></b>: {{ job.description }}</li>
+{% empty %}
+    <p>No jobs available.</p>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "jobs/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Top Job Matches for You</h2>
+
+{% if results %}
+    <ul>
+    {% for job in results %}
+        <li class="mb-4 p-3 border rounded shadow">
+            <h3 class="font-semibold">{{ job.title }}</h3>
+            <p>{{ job.description|safe }}</p>
+            {% if job.url %}
+                <a href="{{ job.url }}" target="_blank" class="text-blue-600">Apply Here</a>
+            {% else %} 
+                <span class="text-gray-500">No link available</span>
+            {% endif %}    
+            <p><strong>Match Score:</strong> {{ job.score|floatformat:2 }}</p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No matches found.</p>
+{% endif %}
+
+<hr class="my-6">
+
+<!-- See more button -->
+<div class="text-center">
+    <a href="{% url 'all_jobs' %}" class="bg-blue-500 text-white px-4 py-2 rounded">See More Jobs</a>
+</div>
+
+{% endblock %}

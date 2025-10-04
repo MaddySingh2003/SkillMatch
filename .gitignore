@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+*.sqlite3
+
+# Django
+*.log
+*.pot
+*.pyc
+*.coverage
+db.sqlite3
+/staticfiles/
+media/
+
+# FastAPI / API files
+*.env
+
+# Tailwind / Node.js
+node_modules/
+dist/
+*.css.map
+
+# IDEs / Editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

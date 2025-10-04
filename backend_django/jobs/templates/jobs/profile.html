@@ -1,0 +1,96 @@
+{% extends "jobs/base.html" %}
+{% load static %}
+{% comment %} {% load custom_filters %} {% endcomment %}
+
+{% block content %}
+
+    <!-- Profile Card -->
+    <div class=" flex items-center justify-center bg-gray-100">
+    <div class=" w-full max-w-md text-center">
+        <h1 class="text-2xl font-bold mb-2">Welcome, {{ user.username|title }}</h1>
+        <p class="text-blue-600">{{ user.email }}</p>
+    </div>
+</div>
+       
+
+    <!-- Resume Card -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            📄 Resume
+        </h2>
+        {% if resume %}
+            <p class="text-gray-600 mb-2">
+                <span class="font-medium">Uploaded:</span> {{ resume.uploaded_at|date:"M d, Y, H:i A" }}
+            </p>
+            <a href="{{ resume.file.url }}" target="_blank" 
+               class="inline-block text-blue-600 font-medium hover:underline">
+                View Resume →
+            </a>
+        {% else %}
+            <p class="text-gray-500">No resume uploaded yet. Upload one to get recommendations!</p>
+        {% endif %}
+      <a href="{% url 'upload_resume' %}">
+    <button
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+        Upload / Change
+    </button>
+</a>
+    </div>
+
+    <!-- Recently Viewed Jobs -->
+<div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">🕒 Recently Viewed Jobs</h2>
+    
+    {% if recent_views %}
+        <ul class="space-y-3">
+            {% for view in recent_views %}
+            <li>
+                <!-- Link to job_detail page -->
+                <a href="{% url 'job_detail' view.job.id %}" 
+                   class="block p-3 rounded-lg border hover:bg-gray-50 transition">
+                    <span class="text-blue-600 font-medium">{{ view.job.title }}</span>
+                    <p class="text-sm text-gray-500 truncate">{{ view.job.company }}</p>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-500">No recent views yet.</p>
+    {% endif %}
+</div>
+
+
+ <!-- Recommended Jobs -->
+<div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+ <div class="flex items-center justify-between w-full mb-4"> <h2 class="text-xl font-semibold text-gray-800 mb-4">⭐ Recommended Jobs for You</h2>
+    <a href="{% url 'recommendations' %}"  class="text-indigo-600 hover:underline font-medium">ALL</a></div>
+    {% if recommendations %}
+        <div class="grid md:grid-cols-2 gap-6">
+            {% for job in recommendations %}
+            <div class="p-5 rounded-xl border hover:shadow-xl transition bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800">{{ job.title }}</h3>
+                <p class="text-sm text-gray-600 mt-1 line-clamp-3">
+                    {{ job.description|truncatewords:25 }}
+                </p>
+
+               {% if job.link %}
+<a href="{% url 'job_detail' job.id %}" 
+   class="mt-4 inline-block text-sm px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-black transition">
+   View and Apply →
+</a>
+
+{% else %}
+<button disabled
+   class="mt-4 inline-block text-sm px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed">
+    No Apply Link
+</button>
+{% endif %}
+
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-500">No recommendations yet. Upload your resume to get personalized matches.</p>
+    {% endif %}
+</div>
+{% endblock %}
