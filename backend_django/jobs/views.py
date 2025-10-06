@@ -41,7 +41,7 @@ def upload_resume(request):
 
             # ✅ Fetch jobs if DB is empty
             if Job.objects.count() == 0:
-                fetch_jobs_from_remoteok(limit=50)
+                fetch_jobs_from_remoteok(limit=100)
 
             # ✅ Get recommendations
             jobs = Job.objects.all()
@@ -65,7 +65,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("home")
+            return redirect("login")
     else:
         form = RegisterForm()
     return render(request, "jobs/register.html", {"form": form})
@@ -178,3 +178,33 @@ def apply_job(request, job_id):
     default_link = "https://remoteok.com/"  # ← You can change this to any site you want
     return redirect(default_link)
 
+
+@login_required
+def view_resume(request, resume_id):
+    resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+    return render(request, "jobs/view_resume.html", {"resume": resume})
+
+
+
+
+from django.http import JsonResponse
+
+def load_more_jobs(request):
+    page = int(request.GET.get("page", 1))
+    per_page = 5
+    start = (page - 1) * per_page
+    end = page * per_page
+
+    jobs = Job.objects.all().order_by('-id')[start:end]
+
+    job_data = []
+    for job in jobs:
+        job_data.append({
+            "id": job.id,
+            "title": job.title,
+            "description": job.description,
+            "link": job.link,  # ✅ using model field
+            "score": getattr(job, "score", 0),  # ✅ includes ATS score if exists
+        })
+
+    return JsonResponse({"jobs": job_data})

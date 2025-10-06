@@ -1,31 +1,81 @@
 {% extends "jobs/base.html" %}
 {% block content %}
+
 <h2 class="text-2xl font-bold mb-4">Top Job Matches for You</h2>
 
 {% if results %}
-    <ul>
-    {% for job in results %}
-        <li class="mb-4 p-3 border rounded shadow">
-            <h3 class="font-semibold">{{ job.title }}</h3>
-            <p>{{ job.description|safe }}</p>
-            {% if job.url %}
-                <a href="{{ job.url }}" target="_blank" class="text-blue-600">Apply Here</a>
-            {% else %} 
-                <span class="text-gray-500">No link available</span>
-            {% endif %}    
-            <p><strong>Match Score:</strong> {{ job.score|floatformat:2 }}</p>
-        </li>
-    {% endfor %}
+    <ul id="jobs-container" class="space-y-4">
+        {% for job in results %}
+            <li class="mb-4 p-3 border rounded shadow bg-white hover:shadow-lg transition">
+                <h3 class="font-semibold text-lg text-gray-800">{{ job.title }}</h3>
+                <p class="text-gray-600 mt-2">{{ job.description|safe }}</p>
+                
+                {% if job.url %}
+                    <a href="{% url 'job_detail' job.id %}" 
+   class="mt-4 inline-block text-sm px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-black transition">
+   View and Apply →
+</a>    
+                {% else %}
+                    <span class="text-gray-500">No link available</span>
+                {% endif %}
+                
+                <p class="mt-2 text-sm text-gray-700">
+                    <strong>Match Score:</strong> {{ job.score|floatformat:2 }}
+                </p>
+            </li>
+        {% endfor %}
     </ul>
 {% else %}
     <p>No matches found.</p>
 {% endif %}
 
-<hr class="my-6">
-
-<!-- See more button -->
-<div class="text-center">
-    <a href="{% url 'all_jobs' %}" class="bg-blue-500 text-white px-4 py-2 rounded">See More Jobs</a>
+<!-- See More Button (stays at bottom of page) -->
+<div class="text-center mt-6">
+    <button id="see-more-btn" 
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+        See More Jobs
+    </button>
 </div>
+
+<!-- JavaScript for dynamic loading -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById("see-more-btn");
+    const container = document.getElementById("jobs-container");
+    let page = 1; // 🔹 track which batch to load next
+
+    btn.addEventListener("click", function() {
+        page += 1;
+        fetch("{% url 'load_more_jobs' %}?page=" + page)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.jobs || data.jobs.length === 0) {
+                    btn.disabled = true;
+                    btn.textContent = "No More Jobs";
+                    return;
+                }
+
+                const newJobsHTML = data.jobs.map(job => `
+                    <li class="mb-4 p-3 border rounded shadow bg-white hover:shadow-lg transition">
+                        <h3 class="font-semibold text-lg text-gray-800">${job.title}</h3>
+                        <p class="text-gray-600 mt-2">${job.description}</p>
+                        ${job.link
+                            ? `<a href="${job.link}" target="_blank"
+                                class="mt-4 inline-block text-sm px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-black transition">
+                                View and Apply →
+                               </a>`
+                            : `<span class="text-gray-500">No link available</span>`}
+                        <p class="mt-2 text-sm text-gray-700">
+                            <strong>Match Score:</strong> ${parseFloat(job.score).toFixed(2)}
+                        </p>
+                    </li>
+                `).join('');
+
+                container.insertAdjacentHTML('beforeend', newJobsHTML);
+            })
+            .catch(error => console.error("Error loading more jobs:", error));
+    });
+});
+</script>
 
 {% endblock %}

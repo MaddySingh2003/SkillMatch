@@ -22,10 +22,10 @@
             <p class="text-gray-600 mb-2">
                 <span class="font-medium">Uploaded:</span> {{ resume.uploaded_at|date:"M d, Y, H:i A" }}
             </p>
-            <a href="{{ resume.file.url }}" target="_blank" 
-               class="inline-block text-blue-600 font-medium hover:underline">
-                View Resume →
-            </a>
+            <a href="{% url 'view_resume' resume.id %}" 
+   class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-black transition">
+   View Resume
+</a>
         {% else %}
             <p class="text-gray-500">No resume uploaded yet. Upload one to get recommendations!</p>
         {% endif %}
@@ -63,8 +63,9 @@
  <!-- Recommended Jobs -->
 <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
  <div class="flex items-center justify-between w-full mb-4"> <h2 class="text-xl font-semibold text-gray-800 mb-4">⭐ Recommended Jobs for You</h2>
+    {% if resume %}
     <a href="{% url 'recommendations' %}"  class="text-indigo-600 hover:underline font-medium">ALL</a></div>
-    {% if recommendations %}
+     {% if recommendations %}
         <div class="grid md:grid-cols-2 gap-6">
             {% for job in recommendations %}
             <div class="p-5 rounded-xl border hover:shadow-xl transition bg-gray-50">
@@ -86,11 +87,15 @@
 </button>
 {% endif %}
 
+
             </div>
             {% endfor %}
         </div>
     {% else %}
         <p class="text-gray-500">No recommendations yet. Upload your resume to get personalized matches.</p>
     {% endif %}
+    {%else%}
+<h1>No Resume Uploaded</h1>
+{% endif %}
 </div>
 {% endblock %}
