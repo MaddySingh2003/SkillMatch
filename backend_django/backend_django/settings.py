@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4+fepaz=i=fb#(rl61+fq4bs=*&y^cj&f&@7b3ytt=#zdoh+qd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1','https://skillmatch-7whl.onrender.com']
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1','https://skillmatch-7whl.onrender.com']
 
 
 # Application definition
@@ -128,7 +128,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # If your theme app has its own static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'theme/static'),
+    BASE_DIR / "theme/static",  # remove this if folder doesn't exist
 ]
 
 
