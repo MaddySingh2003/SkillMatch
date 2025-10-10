@@ -121,19 +121,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+
 STATIC_URL = '/static/'
-
-# If you're using collectstatic
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# If your theme app has its own static files
-STATICFILES_DIRS = [
-    BASE_DIR / "theme/static",  # remove this if folder doesn't exist
-]
-
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'theme' / 'static']  # adjust if your theme/static exists
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
