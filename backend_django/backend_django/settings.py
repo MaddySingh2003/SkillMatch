@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4+fepaz=i=fb#(rl61+fq4bs=*&y^cj&f&@7b3ytt=#zdoh+qd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG","True")=="True"
+DEBUG =False
 
-ALLOWED_HOSTS = ["*" ,"localhost", '127.0.0.1','https://skillmatch-7whl.onrender.com']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -124,7 +124,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / "theme"/"static"]
+STATICFILES_DIRS = [ BASE_DIR / 'theme' / 'static',
+    BASE_DIR / 'jobs' / 'static',]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
