@@ -39,12 +39,13 @@ INSTALLED_APPS = [
     'jobs',
     'tailwind',
     'theme',
-    'django.contrib.staticfiles',
 ]
 TAILWIND_APP_NAME='theme'
 INTERNAL_IPS=['127.0.0.1']
-NPM_BIN_PATH=r"C:\Program Files\nodejs\npm.cmd"
-
+if os.getenv('RENDER', False):
+    NPM_BIN_PATH = '/usr/bin/npm'
+else:
+    NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
