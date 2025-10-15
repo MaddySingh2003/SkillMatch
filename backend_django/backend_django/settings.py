@@ -24,8 +24,7 @@ SECRET_KEY = 'django-insecure-4+fepaz=i=fb#(rl61+fq4bs=*&y^cj&f&@7b3ytt=#zdoh+qd
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =False
-
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
     'jobs',
     'tailwind',
     'theme',
+    'django.contrib.staticfiles',
 ]
 TAILWIND_APP_NAME='theme'
 INTERNAL_IPS=['127.0.0.1']
@@ -121,11 +121,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [ BASE_DIR / 'theme' / 'static',
-    BASE_DIR / 'jobs' / 'static',]
+
+# Folder where collectstatic will put all static files (including from apps)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Optional extra dirs (for your top-level static folder or theme)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'theme', 'static'),
+    os.path.join(BASE_DIR, 'jobs', 'static'),
+]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -134,4 +140,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
