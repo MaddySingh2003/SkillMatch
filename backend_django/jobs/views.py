@@ -17,44 +17,45 @@ def home(request):
     return render(request, "jobs/home.html", {"jobs": jobs})
 
 
-
 @login_required(login_url='login')
 def upload_resume(request): 
     if request.method == "POST":
         form = ResumeForm(request.POST, request.FILES)
         if form.is_valid():
-            # if(UserWarning):
-            #     return redirect("login")
-            
-            # 🔁 Delete existing resume (to avoid IntegrityError)
             Resume.objects.filter(user=request.user).delete()
 
-            # ✅ Create new resume
-            resume = form.save(commit=False)
-            resume.user = request.user
-            resume.save()
+            try:
+                Resume.objects.filter(user=request.user).delete()
+                resume = form.save(commit=False)
+                resume.user = request.user
+                resume.save()
 
-            # ✅ Extract text from uploaded resume
-            resume_text = parse_resume(resume.file.path)
-            resume.text = resume_text
-            resume.save()
+                # Debug logging
+                print("✅ Resume saved at:", resume.file.path)
 
-            # ✅ Fetch jobs if DB is empty
-            if Job.objects.count() == 0:
-                fetch_jobs_from_remoteok(limit=100)
+                resume_text = parse_resume(resume.file.path)
+                print("✅ Parsed text length:", len(resume_text))
 
-            # ✅ Get recommendations
-            jobs = Job.objects.all()
-            recommendations = get_recommendations_from_fastapi(resume_text, jobs)
+                resume.text = resume_text
+                resume.save()
 
-            # ✅ Store recommendations in session
-            request.session["recommendations"] = recommendations
+                if Job.objects.count() == 0:
+                    fetch_jobs_from_remoteok(limit=100)
 
-            # ✅ Redirect to recommendations page
-            return redirect("recommendations")
+                jobs = Job.objects.all()
+                recommendations = get_recommendations_from_fastapi(resume_text, jobs)
+                print("✅ Got recommendations:", len(recommendations))
+
+                request.session["recommendations"] = recommendations
+                return redirect("recommendations")
+
+            except Exception as e:
+                import traceback
+                print("❌ Upload error:", e)
+                traceback.print_exc()
+                return render(request, "jobs/upload_resume.html", {"form": form, "error": str(e)})
     else:
         form = ResumeForm()
-
     return render(request, "jobs/upload_resume.html", {"form": form})
 
 

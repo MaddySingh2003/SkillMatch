@@ -17,8 +17,15 @@ def parse_resume(file_path):
         for para in doc.paragraphs:
             text += para.text + "\n"
     return text
+
 def get_recommendations_from_fastapi(resume_text, jobs):
-    url = "http://127.0.0.1:8001/recommend"  # ✅ must match FastAPI route
+    ENV=os.environ.get("ENV","local").lower()
+    if ENV=="local":
+         url = "http://127.0.0.1:8001/recommend"
+    else:
+        url = "https://skillmatch-fastapi.onrender.com/recommend"    
+    
+  # ← replace once confirmed
     payload = {
         "resume_text": resume_text,
         "jobs": [
@@ -26,20 +33,18 @@ def get_recommendations_from_fastapi(resume_text, jobs):
                 "id": job.id,
                 "title": job.title,
                 "description": job.description,
-                "url": getattr(job, "url", "#")  # fallback if no URL field
+                "url": getattr(job, "url", "#"),
             }
             for job in jobs
-        ]
+        ],
     }
     try:
         response = requests.post(url, json=payload)
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        print("FastAPI error:", e)
+        print("⚠️ FastAPI request failed:", e)
         return []
-
-
 
 def fetch_jobs_from_remoteok(limit=100):
     url = "https://remoteok.com/api"
