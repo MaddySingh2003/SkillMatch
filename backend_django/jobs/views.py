@@ -10,6 +10,7 @@ from .models import Job
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Job, UserJobView
+from django.contrib import messages
 
 
 def home(request):
@@ -79,6 +80,9 @@ def login_view(request):
         if user:
             login(request, user)
             return redirect("home")
+        else:
+            messages.info(request, 'User not found. Please register.')
+            return redirect('register')
     return render(request, "jobs/login.html")
 
 def logout_view(request):

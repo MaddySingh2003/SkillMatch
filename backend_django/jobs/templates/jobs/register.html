@@ -8,6 +8,12 @@
 
     <form method="POST" class="space-y-5">
       {% csrf_token %}
+       <ul class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
       {% for field in form %}
         <div>

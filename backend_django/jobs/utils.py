@@ -48,30 +48,44 @@ def get_recommendations_from_fastapi(resume_text, jobs):
 
 def fetch_jobs_from_remoteok(limit=100):
     url = "https://remoteok.com/api"
-    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-    data = response.json()
+    headers = {"User-Agent": "Mozilla/5.0"}
 
-    jobs = []
-    for job in data[1:limit+1]:
-        title = job.get("position", "No Title")
-        desc = job.get("description", "")[:300]
-        job_link = job.get("url")
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
 
-        # ✅ Clean invalid / blank links
-        if not job_link or job_link.strip() == "":
-            job_link = None
+        if response.status_code != 200:
+            print(f"❌ RemoteOK API error. Status: {response.status_code}")
+            print(f"❌ Response: {response.text[:300]}")
+            return []
 
-        job_obj = Job.objects.create(
-            title=title,
-            description=desc,
-            link=job_link,  # Can safely be None
-        )
+        try:
+            data = response.json()
+        except requests.exceptions.JSONDecodeError:
+            print("❌ Failed to parse JSON from RemoteOK API")
+            print(f"❌ Raw content: {response.text[:300]}")
+            return []
 
-        jobs.append({
-            "id": job_obj.id,
-            "title": title,
-            "description": desc,
-            "link": job_link,
-        })
+        jobs = []
+        for job in data[1:limit+1]:  # Skip first item (metadata)
+            title = job.get("position", "No Title")
+            desc = job.get("description", "")[:300]
+            job_link = job.get("url") or None
 
-    return jobs
+            job_obj = Job.objects.create(
+                title=title,
+                description=desc,
+                link=job_link,
+            )
+
+            jobs.append({
+                "id": job_obj.id,
+                "title": title,
+                "description": desc,
+                "link": job_link,
+            })
+
+        return jobs
+
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Exception while fetching jobs: {e}")
+        return []
