@@ -4,7 +4,8 @@ from sentence_transformers import SentenceTransformer, util
 
 app = FastAPI()
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("paraphrase-MiniLM-L3-v2")  # ~300 MB
+
 
 class ResumeRequest(BaseModel):
     resume_text: str
@@ -16,7 +17,8 @@ class ResumeRequest(BaseModel):
 def recommend(data: ResumeRequest):
     resume_text = data.resume_text
     jobs = data.jobs
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = SentenceTransformer("paraphrase-MiniLM-L3-v2")  # ~300 MB
+
 
     resume_emb = model.encode(resume_text, convert_to_tensor=True)
 
