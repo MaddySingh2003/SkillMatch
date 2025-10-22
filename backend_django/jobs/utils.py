@@ -45,16 +45,27 @@ def get_recommendations_from_fastapi(resume_text, jobs):
     except Exception as e:
         print("⚠️ FastAPI request failed:", e)
         return []
-
 def fetch_jobs_from_remoteok(limit=100):
-    # ✅ Works both locally & on Render using public proxy
-    url = "https://api.allorigins.win/raw?url=https://remoteok.com/api"
-    try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-        response.raise_for_status()
-        data = response.json()
-    except Exception as e:
-        print("RemoteOK API error:", e)
+    urls = [
+        "https://remoteok.com/api",  # direct
+        "https://api.allorigins.win/raw?url=https://remoteok.com/api",
+        "https://r.jina.ai/https://remoteok.com/api",  # very reliable
+    ]
+
+    data = None
+    for url in urls:
+        try:
+            print(f"🌐 Trying {url}")
+            response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            print(f"✅ Success: fetched from {url}")
+            break
+        except Exception as e:
+            print(f"❌ Failed: {url} — {e}")
+
+    if not data:
+        print("🚨 All RemoteOK sources failed")
         return []
 
     jobs = []
