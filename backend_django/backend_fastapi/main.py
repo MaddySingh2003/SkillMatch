@@ -17,15 +17,15 @@ class ResumeRequest(BaseModel):
 def recommend(data: ResumeRequest):
     resume_text = data.resume_text
     jobs = data.jobs
-    model = SentenceTransformer("paraphrase-MiniLM-L3-v2")  # ~300 MB
-
-
     
+
+
+    resume_emb = model.encode(resume_text, convert_to_tensor=True)
 
     results = []
     for job in jobs:
         job_emb = model.encode(job["description"], convert_to_tensor=True)
-        score = float(util.cos_sim(model, job_emb))
+        score = float(util.cos_sim(resume_emb, job_emb))
         results.append({
             "id": job["id"],
             "title": job["title"],
