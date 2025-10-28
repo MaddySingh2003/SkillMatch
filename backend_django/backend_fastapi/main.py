@@ -3,23 +3,18 @@ from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer, util
 
 app = FastAPI()
-model = None  # model will be loaded lazily
+
+# 🔹 Load only once (global, not per request)
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 class ResumeRequest(BaseModel):
     resume_text: str
-    jobs: list
-
-@app.on_event("startup")
-async def load_model():
-    global model
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    jobs: list  # Each job is a dict with id, title, description, url
 
 @app.post("/recommend")
 def recommend(data: ResumeRequest):
-    global model
-    if model is None:
-        model = SentenceTransformer("all-MiniLM-L6-v2")  # fallback
     resume_emb = model.encode(data.resume_text, convert_to_tensor=True)
+
     results = []
     for job in data.jobs:
         job_emb = model.encode(job["description"], convert_to_tensor=True)
@@ -31,6 +26,7 @@ def recommend(data: ResumeRequest):
             "url": job["url"],
             "score": score
         })
+
     return sorted(results, key=lambda x: x["score"], reverse=True)[:10]
 
 if __name__ == "__main__":
