@@ -3,3 +3,4 @@ uvicorn
 torch
 sentence-transformers==2.2.2
 pydantic
+huggingface_hub==0.24.6
